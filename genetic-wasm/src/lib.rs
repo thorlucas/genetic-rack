@@ -27,6 +27,8 @@ pub struct Vec3 {
     pub z: f32,
 }
 
+const RAND_SPEED: f32 = 10.0;
+
 #[wasm_bindgen]
 pub struct Sim {
     points: Vec<Vec3>,
@@ -38,7 +40,7 @@ impl Sim {
         let mut points: Vec<Vec3> = Vec::with_capacity(n_points);
         let mut rng = rand::thread_rng();
 
-        for i in 0..n_points {
+        for _ in 0..n_points {
             points.push(Vec3 {
                 x: rng.gen_range(-20.0..20.0),
                 y: rng.gen_range(-20.0..20.0),
@@ -53,5 +55,15 @@ impl Sim {
 
     pub fn points_buffer_ptr(&self) -> *const f32 {
         self.points.as_ptr() as *const f32
+    }
+
+    pub fn random_walk(&mut self, dt: f32) {
+        let mut rng = rand::thread_rng();
+
+        for p in &mut self.points {
+            p.x += (rng.gen::<f32>() - 0.5) * dt * RAND_SPEED;
+            p.y += (rng.gen::<f32>() - 0.5) * dt * RAND_SPEED;
+            p.z += (rng.gen::<f32>() - 0.5) * dt * RAND_SPEED;
+        }
     }
 }

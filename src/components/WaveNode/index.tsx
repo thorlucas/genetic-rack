@@ -34,16 +34,10 @@ const WaveNode: React.FC = () => {
 	}, []);
 
 	useFrame((state, delta) => {
-		if (!posArray) {
+		if (!sim) {
 			return;
 		}
-
-		for (let i = 0; i < nPoints; ++i) {
-			randVec.randomDirection().multiplyScalar(0.1);
-			tempVec.fromArray(posArray, i * 3);
-			tempVec.add(randVec);
-			tempVec.toArray(posArray, i * 3);
-		}
+		sim.random_walk(delta);
 		pRef.current.geometry.attributes.position.needsUpdate = true;
 	});
 
