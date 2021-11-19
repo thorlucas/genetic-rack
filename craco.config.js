@@ -1,11 +1,15 @@
 const { addBeforeLoader, loaderByName } = require('@craco/craco');
 const { CracoAliasPlugin, configPaths } = require('react-app-rewire-alias');
+const path = require('path');
 
 module.exports = {
 	webpack: {
 		configure: (webpackConfig) => {
 			const wasmExtRegex = /\.wasm$/;
 			webpackConfig.resolve.extensions.push('.wasm');
+			webpackConfig.resolve.symlinks = false;
+			//webpackConfig.resolve.roots = [path.resolve(__dirname, 'node_modules')]
+			//webpackConfig.resolveLoader.roots = [path.resolve(__dirname, 'node_modules')]
 
 			webpackConfig.module.rules.forEach((rule) => {
 				(rule.oneOf || []).forEach((oneOf) => {

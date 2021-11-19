@@ -1951,8 +1951,9 @@
   dependencies:
     "@babel/runtime" "^7.12.5"
 
-"@thorlucas/genetic-wasm@file:./genetic-wasm/pkg":
-  version "0.1.0"
+"@thorlucas/genetic-wasm@link:./genetic-wasm/pkg":
+  version "0.0.0"
+  uid ""
 
 "@tootallnate/once@1":
   version "1.1.2"
