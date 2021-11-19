@@ -29,29 +29,29 @@ pub struct Vec3 {
 
 #[wasm_bindgen]
 pub struct Sim {
-    foo: Vec<u8>,
+    points: Vec<Vec3>,
 }
 
 #[wasm_bindgen]
 impl Sim {
-    pub fn new() -> Self {
-        //let mut points: Vec<Vec3> = Vec::with_capacity(n_points);
-        //let mut rng = rand::thread_rng();
+    pub fn new(n_points: usize) -> Self {
+        let mut points: Vec<Vec3> = Vec::with_capacity(n_points);
+        let mut rng = rand::thread_rng();
 
-        //for p in &mut points {
-            //p.x = (rng.gen::<f32>() - 0.5) * 40.0;
-            //p.y = (rng.gen::<f32>() - 0.5) * 40.0;
-            //p.z = (rng.gen::<f32>() - 0.5) * 40.0;
-        //}
-
+        for i in 0..n_points {
+            points.push(Vec3 {
+                x: rng.gen_range(-20.0..20.0),
+                y: rng.gen_range(-20.0..20.0),
+                z: rng.gen_range(-20.0..20.0),
+            });
+        }
         
         return Self {
-            foo: vec![1, 2, 3, 4, 5],
-            //points,
+            points,
         }
     }
 
-    pub fn foo_ptr(&self) -> *const u8 {
-        self.foo.as_ptr()
+    pub fn points_buffer_ptr(&self) -> *const f32 {
+        self.points.as_ptr() as *const f32
     }
 }

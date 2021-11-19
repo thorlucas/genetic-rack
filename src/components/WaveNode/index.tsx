@@ -8,7 +8,7 @@ import type { Sim } from '@thorlucas/genetic-wasm';
 const tempVec = new Vector3();
 const randVec = new Vector3();
 
-const nPoints = 1;
+const nPoints = 1000;
 
 const WaveNode: React.FC = () => {
 	const gRef = useRef<THREE.Mesh>(null!)
@@ -16,41 +16,36 @@ const WaveNode: React.FC = () => {
 
 	const [posArray, setPosArray] = useState<Float32Array>(null!);
 	const [sim, setSim] = useState<Sim>(null!);
-	const [fooArray, setFooArray] = useState<Uint8Array>(null!);
 
 	useEffect(() => {
 		async function makeSim() {
 			const { Sim } = await import('@thorlucas/genetic-wasm');
 			const { memory } = await import('@thorlucas/genetic-wasm/genetic_wasm_bg.wasm');
 			
-			const sim = Sim.new();
-			const arr_ptr = sim.foo_ptr();
-			const arr = new Uint8Array(memory.buffer, arr_ptr, 5);
+			const sim = Sim.new(nPoints);
+			const arr_ptr = sim.points_buffer_ptr();
+			const arr = new Float32Array(memory.buffer, arr_ptr, nPoints * 3);
 
 			setSim(sim);
-			setFooArray(arr);
+			setPosArray(arr);
 		}
 
 		makeSim();
 	}, []);
 
-	useEffect(() => {
-		console.log(fooArray);
-	}, [fooArray]);
+	useFrame((state, delta) => {
+		if (!posArray) {
+			return;
+		}
 
-	//useFrame((state) => {
-		//if (!posArray) {
-			//return;
-		//}
-
-		//for (let i = 0; i < nPoints; ++i) {
-			//randVec.randomDirection().multiplyScalar(0.1);
-			//tempVec.fromArray(posArray, i * 3);
-			//tempVec.add(randVec);
-			//tempVec.toArray(posArray, i * 3);
-		//}
-		//pRef.current.geometry.attributes.position.needsUpdate = true;
-	//});
+		for (let i = 0; i < nPoints; ++i) {
+			randVec.randomDirection().multiplyScalar(0.1);
+			tempVec.fromArray(posArray, i * 3);
+			tempVec.add(randVec);
+			tempVec.toArray(posArray, i * 3);
+		}
+		pRef.current.geometry.attributes.position.needsUpdate = true;
+	});
 
 	return (
 		<>
