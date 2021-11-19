@@ -1,13 +1,15 @@
-import Box from '@components/Box';
+import WaveNode from '@components/WaveNode';
 import { Canvas } from '@react-three/fiber';
 import React from 'react';
 
 const App: React.FC = () => {
 	return (
-		<Canvas mode="concurrent">
+		<Canvas
+			mode="concurrent"
+		
+			camera={{ position: [0.0, 0.0, 100.0] }}>
 			<ambientLight />
-			<pointLight position={ [10, 10, 10] } />
-			<Box />
+			<WaveNode />
 		</Canvas>
 	);
 }
