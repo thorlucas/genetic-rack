@@ -1,0 +1,20 @@
+{
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"@components/*": ["src/components/*"],
+			"@UI/*": ["src/components/UI/*"],
+
+			"@assets/*": ["src/assets/*"],
+
+			"@contexts": ["src/contexts/index.ts"],
+			"@contexts/*": ["src/contexts/*"],
+
+			"@hooks": ["src/hooks"],
+			"@hooks/*": ["src/hooks/*"],
+
+			"@adapters": ["src/adapters"],
+			"@adapters/*": ["src/adapters/*"]
+		}
+	}
+}
