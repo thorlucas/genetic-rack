@@ -3,11 +3,6 @@ import { Canvas } from '@react-three/fiber';
 import React, { useEffect } from 'react';
 
 const App: React.FC = () => {
-	useEffect(() => {
-		//import('@thorlucas/genetic-wasm').then(module => {
-			//module.greet();
-		//});
-	}, []);
 
 	return (
 		<Canvas
