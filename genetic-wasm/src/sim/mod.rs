@@ -65,7 +65,7 @@ impl Sim {
 
             *p.position += dr;
             *p.momentum += dp;
-            *p.lifetime -= dt;
+            p.tick_lifetime(dt);
         }
     }
 }

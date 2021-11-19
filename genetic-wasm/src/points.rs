@@ -1,13 +1,17 @@
-use std::{borrow::BorrowMut, cell::{RefCell, RefMut}};
 use glam::Vec3;
-
-#[derive(Debug)]
-pub struct PointHandle<'a>(usize, std::marker::PhantomData<&'a mut PointPool>);
 
 pub struct PointMutRef<'a> {
     pub position: &'a mut Vec3,
     pub momentum: &'a mut Vec3,
-    pub lifetime: &'a mut f32,
+    lifetime: &'a mut f32,
+    pool: &'a mut PointPool,
+    index: usize,
+}
+
+impl PointMutRef<'_> {
+    pub fn tick_lifetime(self, dt: f32) {
+        self.pool.kill_index(self.index)
+    }
 }
 
 enum PointLife {
@@ -45,7 +49,7 @@ impl<'a> PointPool {
         }
     }
 
-    pub fn spawn(&mut self, position: Vec3, momentum: Vec3, lifetime: f32) -> Result<PointHandle<'a>, ()> {
+    pub fn spawn(&mut self, position: Vec3, momentum: Vec3, lifetime: f32) -> Result<(), ()> {
         if let Some(index) = self.next {
             if let PointLife::Dead(next) = self.lives[index] {
                 self.next = next;
@@ -53,7 +57,7 @@ impl<'a> PointPool {
                 self.momenta[index] = momentum;
                 self.lives[index] = PointLife::Alive(lifetime, self.first);
                 self.first = Some(index);
-                Ok(PointHandle(index, std::marker::PhantomData))
+                Ok(())
             } else {
                 panic!("Point should be dead!");
             }
@@ -70,14 +74,6 @@ impl<'a> PointPool {
         } else {
             panic!("Point should be alive!");
         }
-    }
-
-    pub fn kill_handle(&mut self, handle: PointHandle) {
-        self.kill_index(handle.0);
-    }
-
-    fn position_mut(&mut self, index: usize) -> &mut Vec3 {
-        &mut self.positions[index]
     }
 
     pub fn iter_mut(&'a mut self) -> IterMut<'a> {
@@ -111,14 +107,16 @@ impl<'a> Iterator for IterMut<'a> {
                 let p_ptr: *mut Vec3 = &mut self.pool.positions[index];
                 let m_ptr: *mut Vec3 = &mut self.pool.momenta[index];
                 let l_ptr: *mut f32 = &mut lifetime;
+                let pool_ptr: *mut PointPool = self.pool;
                 unsafe {
                     return Some(PointMutRef {
                         position: &mut *p_ptr,
                         momentum: &mut *m_ptr,
                         lifetime: &mut *l_ptr,
+                        pool: &mut *pool_ptr,
+                        index,
                     });
                 }
-                // TODO: Remove dead particles
             }
         }
         None
