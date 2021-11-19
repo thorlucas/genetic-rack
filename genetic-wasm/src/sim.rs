@@ -12,13 +12,13 @@ pub const PHYSICS_MAX_FRAMERATE: f32 = 1.0 / 60.0;
 
 #[derive(Deserialize)]
 #[serde(default)]
-pub struct GravityOptions {
+pub struct GravityOpts {
     pub point_mass: f32,
     pub large_mass: f32,
     pub grav_const: f32,
 }
 
-impl Default for GravityOptions {
+impl Default for GravityOpts {
     fn default() -> Self {
         Self {
             point_mass: 10.0,
@@ -30,16 +30,16 @@ impl Default for GravityOptions {
 
 #[derive(Deserialize)]
 #[serde(default)]
-pub struct SimOptions {
+pub struct GravitySimOpts {
     pub max_points: usize,
     #[serde(flatten)]
-    pub gravity: GravityOptions,
+    pub gravity: GravityOpts,
     pub radius: GenRadius,
     pub momentum: GenMomentum,
     pub lifetime: GenLifetime,
 }
 
-impl Default for SimOptions {
+impl Default for GravitySimOpts {
     fn default() -> Self {
         Self {
             max_points: 1000,
@@ -52,7 +52,7 @@ impl Default for SimOptions {
 }
 
 #[wasm_bindgen]
-pub struct Sim {
+pub struct GravitySim {
     reciprocal_point_mass: f32,
     large_mass_gravity: f32,
 
@@ -64,8 +64,8 @@ pub struct Sim {
     acc_dt: f32,
 }
 
-impl Sim {
-    pub fn new(opts: SimOptions) -> Self {
+impl GravitySim {
+    pub fn new(opts: GravitySimOpts) -> Self {
         Self {
             reciprocal_point_mass: 1.0 / opts.gravity.point_mass,
             large_mass_gravity: opts.gravity.large_mass * opts.gravity.grav_const,
@@ -79,7 +79,7 @@ impl Sim {
 }
 
 #[wasm_bindgen]
-impl Sim { 
+impl GravitySim { 
     pub fn positions_buffer_ptr(&self) -> *const f32 {
         self.points.positions_as_ptr() as *const f32
     }
