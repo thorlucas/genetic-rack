@@ -1,3 +1,5 @@
+use wasm_bindgen::prelude::*;
+
 mod utils;
 mod sim;
 mod points;
@@ -9,3 +11,9 @@ mod points;
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 pub use sim::{Sim, SimBuilder};
+use utils::set_panic_hook;
+
+#[wasm_bindgen]
+pub fn init() {
+    set_panic_hook();
+}

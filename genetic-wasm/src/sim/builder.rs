@@ -106,7 +106,7 @@ impl SimBuilder {
             half_life: self.point_halflife,
             max_life: self.point_maxlife,
         };
-        sim.spawn_points(self.initial_points);
+        sim.spawn_points(self.initial_points.min(self.max_points));
         sim
     }
 }

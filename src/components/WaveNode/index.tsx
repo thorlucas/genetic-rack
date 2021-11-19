@@ -8,7 +8,7 @@ import type { Sim } from '@thorlucas/genetic-wasm';
 const tempVec = new Vector3();
 const randVec = new Vector3();
 
-const nPoints = 100;
+const nPoints = 4;
 
 const WaveNode: React.FC = () => {
 	const gRef = useRef<THREE.Mesh>(null!)
@@ -19,8 +19,9 @@ const WaveNode: React.FC = () => {
 
 	useEffect(() => {
 		async function makeSim() {
-			const { Sim } = await import('@thorlucas/genetic-wasm');
+			const { init, Sim } = await import('@thorlucas/genetic-wasm');
 			const { memory } = await import('@thorlucas/genetic-wasm/genetic_wasm_bg.wasm');
+			init();
 			
 			const sim = Sim.build()
 				.max_points(nPoints)
@@ -32,11 +33,11 @@ const WaveNode: React.FC = () => {
 				.large_mass(50.0)
 				.point_halflife(10.0)
 				.create();
-			const arr_ptr = sim.points_buffer_ptr();
-			const arr = new Float32Array(memory.buffer, arr_ptr, nPoints * 3);
+			const pos_ptr = sim.positions_buffer_ptr();
+			const pos = new Float32Array(memory.buffer, pos_ptr, nPoints * 3);
 
 			setSim(sim);
-			setPosArray(arr);
+			setPosArray(pos);
 		}
 
 		makeSim();

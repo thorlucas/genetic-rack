@@ -1,7 +1,13 @@
+use wasm_bindgen::prelude::*;
 use std::f32::consts::{LN_2, TAU};
-
 use glam::{Mat3, Vec3};
 use rand::Rng;
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console)]
+    pub fn log(s: &str);
+}
 
 #[allow(dead_code)]
 pub fn set_panic_hook() {

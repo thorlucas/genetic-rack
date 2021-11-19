@@ -24,7 +24,7 @@ pub struct Sim {
     max_life: Option<f32>,
 }
 
-//#[wasm_bindgen]
+#[wasm_bindgen]
 impl Sim {
     pub fn build() -> SimBuilder {
         SimBuilder::new()
@@ -61,10 +61,14 @@ impl Sim {
     pub fn tick(&mut self, dt: f32) {
         for p in self.points.iter_mut() {
             let dr = self.reciprocal_point_mass * *p.momentum * dt;
+            log(format!("dr: {:?}", dr).as_str());
             let dp = - self.large_mass_gravity / p.position.length().powf(3.0) * *p.position;
+            log(format!("dp: {:?}", dr).as_str());
 
             *p.position += dr;
+            log(format!("new pos: {:?}", *p.position).as_str());
             *p.momentum += dp;
+            log(format!("new mom: {:?}", *p.momentum).as_str());
             p.tick_lifetime(dt);
         }
     }
