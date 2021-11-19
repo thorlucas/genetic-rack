@@ -21,17 +21,6 @@ const WaveNode: React.FC = () => {
 			const { init, Sim, Opts } = await import('@thorlucas/genetic-wasm');
 			const { memory } = await import('@thorlucas/genetic-wasm/genetic_wasm_bg.wasm');
 			
-			//const sim = Sim.build()
-				//.max_points(nPoints)
-				//.initial_points(100)
-				//.max_radius(40.0)
-				//.min_radius(20.0)
-				//.max_perp_momentum(100.0)
-				//.min_perp_momentum(60.0)
-				//.point_mass(10.0)
-				//.large_mass(50.0)
-				//.point_halflife(10.0)
-				//.create();
 			const sim = init({
 				initial_points: 100,
 				radius: { min: 20.0, max: 40.0 },
