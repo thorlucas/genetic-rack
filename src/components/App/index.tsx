@@ -1,8 +1,14 @@
 import WaveNode from '@components/WaveNode';
 import { Canvas } from '@react-three/fiber';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 const App: React.FC = () => {
+	useEffect(() => {
+		import('@thorlucas/genetic-wasm').then(module => {
+			module.greet();
+		});
+	}, []);
+
 	return (
 		<Canvas
 			mode="concurrent"
