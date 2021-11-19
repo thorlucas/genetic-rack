@@ -1,6 +1,8 @@
+use std::{borrow::BorrowMut, cell::{RefCell, RefMut}};
 use glam::Vec3;
 
-pub struct PointHandle<'a>(usize, std::marker::PhantomData<&'a PointPool>);
+#[derive(Debug)]
+pub struct PointHandle<'a>(usize, std::marker::PhantomData<&'a mut PointPool>);
 
 pub struct PointMutRef<'a> {
     pub position: &'a mut Vec3,
@@ -43,18 +45,6 @@ impl<'a> PointPool {
         }
     }
 
-    pub fn get_mut(&mut self, handle: PointHandle<'a>) -> PointMutRef {
-        if let PointLife::Alive(lifetime, _) = &mut self.lives[handle.0] {
-            PointMutRef {
-                position: &mut self.positions[handle.0],
-                momentum: &mut self.momenta[handle.0],
-                lifetime,
-            }
-        } else {
-            panic!("Invalid handle!");
-        }
-    }
-
     pub fn spawn(&mut self, position: Vec3, momentum: Vec3, lifetime: f32) -> Result<PointHandle<'a>, ()> {
         if let Some(index) = self.next {
             if let PointLife::Dead(next) = self.lives[index] {
@@ -72,37 +62,63 @@ impl<'a> PointPool {
         }
     }
 
-    pub fn kill(&mut self, handle: PointHandle<'a>) {
-        if let PointLife::Alive(_, first) = self.lives[handle.0] {
+    fn kill_index(&mut self, index: usize) {
+        if let PointLife::Alive(_, first) = self.lives[index] {
             self.first = first;
-            self.positions[handle.0] = Vec3::ZERO;
-            self.next = Some(handle.0);
+            self.positions[index] = Vec3::ZERO;
+            self.next = Some(index);
         } else {
             panic!("Point should be alive!");
         }
     }
 
-    pub fn iter(&'a self) -> Iter<'a> {
-        Iter {
-            pool: self,
+    pub fn kill_handle(&mut self, handle: PointHandle) {
+        self.kill_index(handle.0);
+    }
+
+    fn position_mut(&mut self, index: usize) -> &mut Vec3 {
+        &mut self.positions[index]
+    }
+
+    pub fn iter_mut(&'a mut self) -> IterMut<'a> {
+        IterMut {
             index: self.first,
+            pool: self,
         }
+    }
+
+    pub fn positions_as_ptr(&self) -> *const Vec3 {
+        self.positions.as_ptr()
+    }
+
+    pub fn momenta_as_ptr(&self) -> *const Vec3 {
+        self.momenta.as_ptr()
     }
 }
 
-pub struct Iter<'a> {
-    pool: &'a PointPool,
+pub struct IterMut<'a> {
+    pool: &'a mut PointPool,
     index: Option<usize>,
 }
 
-impl<'a> Iterator for Iter<'a> {
-    type Item = PointHandle<'a>;
+impl<'a> Iterator for IterMut<'a> {
+    type Item = PointMutRef<'a>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(index) = self.index {
-            if let PointLife::Alive(_, next) = self.pool.lives[index] {
-                self.index = next;
-                return Some(PointHandle(index, std::marker::PhantomData));
+            if let PointLife::Alive(mut lifetime, next) = &mut self.pool.lives[index] {
+                self.index = *next;
+                let p_ptr: *mut Vec3 = &mut self.pool.positions[index];
+                let m_ptr: *mut Vec3 = &mut self.pool.momenta[index];
+                let l_ptr: *mut f32 = &mut lifetime;
+                unsafe {
+                    return Some(PointMutRef {
+                        position: &mut *p_ptr,
+                        momentum: &mut *m_ptr,
+                        lifetime: &mut *l_ptr,
+                    });
+                }
+                // TODO: Remove dead particles
             }
         }
         None

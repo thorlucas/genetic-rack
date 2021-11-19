@@ -1,5 +1,5 @@
 use wasm_bindgen::prelude::*;
-use crate::sim::Sim;
+use crate::{points::PointPool, sim::Sim};
 
 #[wasm_bindgen]
 pub struct SimBuilder {
@@ -96,12 +96,7 @@ impl SimBuilder {
 
     pub fn create(self) -> Sim {
         let mut sim = Sim {
-            points: 0,
-            max_points: self.max_points,
-            positions: Vec::with_capacity(self.max_points),
-            momenta: Vec::with_capacity(self.max_points),
-            alive: Vec::with_capacity(self.max_points),
-            life_time: Vec::with_capacity(self.max_points),
+            points: PointPool::with_capacity(self.max_points),
             min_perp_momentum: self.min_perp_momentum,
             max_perp_momentum: self.max_perp_momentum,
             min_radius: self.min_radius,
