@@ -1,7 +1,10 @@
 mod utils;
 
+use std::f32::consts::{PI, TAU};
+
 use rand::Rng;
 use wasm_bindgen::prelude::*;
+use glam::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -9,25 +12,16 @@ use wasm_bindgen::prelude::*;
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
-#[wasm_bindgen]
-extern {
-    fn alert(s: &str);
-}
-
-#[wasm_bindgen]
-pub fn greet() {
-    alert("Hello, genetic-wasm!");
-}
-
-#[wasm_bindgen]
-#[derive(Default)]
-pub struct Vec3 {
-    pub x: f32,
-    pub y: f32,
-    pub z: f32,
-}
-
 const RAND_SPEED: f32 = 10.0;
+
+fn rand_unit() -> Vec3 {
+    let mut rng = rand::thread_rng();
+    let theta = (1.0 - 2.0 * rng.gen::<f32>()).acos();
+    let phi = TAU * rng.gen::<f32>();
+    
+    let rot = Mat3::from_rotation_ypr(theta, phi, 0.0);
+    rot * Vec3::Y
+}
 
 #[wasm_bindgen]
 pub struct Sim {
@@ -41,11 +35,7 @@ impl Sim {
         let mut rng = rand::thread_rng();
 
         for _ in 0..n_points {
-            points.push(Vec3 {
-                x: rng.gen_range(-20.0..20.0),
-                y: rng.gen_range(-20.0..20.0),
-                z: rng.gen_range(-20.0..20.0),
-            });
+            points.push(rand_unit() * rng.gen::<f32>() * 40.0)
         }
         
         return Self {
