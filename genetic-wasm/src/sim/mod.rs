@@ -2,6 +2,7 @@ use rand::Rng;
 use wasm_bindgen::prelude::*;
 use glam::*;
 use crate::utils::*;
+use crate::points::*;
 
 mod builder;
 pub use builder::SimBuilder;
