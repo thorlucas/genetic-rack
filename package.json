@@ -23,9 +23,10 @@
 		"web-vitals": "^1.0.1"
 	},
 	"scripts": {
-		"start": "craco start",
-		"build": "craco build",
+		"start": "yarn wasm-build; craco start",
+		"build": "yarn wasm-build; craco build",
 		"test": "craco test",
+		"wasm-build": "cd genetic-wasm; wasm-pack build",
 		"eject": "react-scripts eject"
 	},
 	"eslintConfig": {
