@@ -1,5 +1,12 @@
 use glam::Vec3;
 
+#[derive(Copy, Clone, Debug)]
+pub enum PointPoolError {
+    ReachedCapacity,
+}
+
+pub type Result<T> = std::result::Result<T, PointPoolError>;
+
 pub struct PointMutRef<'a> {
     pub position: &'a mut Vec3,
     pub momentum: &'a mut Vec3,
@@ -49,7 +56,7 @@ impl<'a> PointPool {
         }
     }
 
-    pub fn spawn(&mut self, position: Vec3, momentum: Vec3, lifetime: f32) -> Result<(), ()> {
+    pub fn spawn(&mut self, position: Vec3, momentum: Vec3, lifetime: f32) -> Result<()> {
         if let Some(index) = self.next {
             if let PointLife::Dead(next) = self.lives[index] {
                 self.next = next;
@@ -62,7 +69,7 @@ impl<'a> PointPool {
                 panic!("Point should be dead!");
             }
         } else {
-            Err(())
+            Err(PointPoolError::ReachedCapacity)
         }
     }
 
