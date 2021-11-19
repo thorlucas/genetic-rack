@@ -7,6 +7,8 @@ use crate::points::*;
 mod builder;
 pub use builder::SimBuilder;
 
+pub const PHYSICS_MAX_FRAMERATE: f32 = 1.0 / 60.0;
+
 #[wasm_bindgen]
 pub struct Sim {
     points: PointPool,
@@ -22,6 +24,8 @@ pub struct Sim {
 
     half_life: Option<f32>,
     max_life: Option<f32>,
+
+    acc_dt: f32,
 }
 
 #[wasm_bindgen]
@@ -59,17 +63,22 @@ impl Sim {
     }
 
     pub fn tick(&mut self, dt: f32) {
-        for p in self.points.iter_mut() {
-            let dr = self.reciprocal_point_mass * *p.momentum * dt;
-            //log(format!("dr: {:?}", dr).as_str());
-            let dp = - self.large_mass_gravity / p.position.length().powf(3.0) * *p.position;
-            //log(format!("dp: {:?}", dr).as_str());
+        self.acc_dt += dt;
+        if (self.acc_dt >= PHYSICS_MAX_FRAMERATE) {
+            let dt = self.acc_dt;
+            self.acc_dt = 0.0;
+            for p in self.points.iter_mut() {
+                let dr = self.reciprocal_point_mass * *p.momentum * dt;
+                //log(format!("dr: {:?}", dr).as_str());
+                let dp = - self.large_mass_gravity / p.position.length().powf(3.0) * *p.position;
+                //log(format!("dp: {:?}", dr).as_str());
 
-            *p.position += dr;
-            //log(format!("new pos: {:?}", *p.position).as_str());
-            *p.momentum += dp;
-            //log(format!("new mom: {:?}", *p.momentum).as_str());
-            p.tick_lifetime(dt);
+                *p.position += dr;
+                //log(format!("new pos: {:?}", *p.position).as_str());
+                *p.momentum += dp;
+                //log(format!("new mom: {:?}", *p.momentum).as_str());
+                p.tick_lifetime(dt);
+            }
         }
     }
 }

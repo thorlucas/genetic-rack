@@ -110,6 +110,7 @@ impl SimBuilder {
             large_mass_gravity: self.large_mass * self.gravity,
             half_life: self.point_halflife,
             max_life: self.point_maxlife,
+            acc_dt: 0.0,
         };
         sim.spawn_points(self.initial_points.min(self.max_points));
         sim
