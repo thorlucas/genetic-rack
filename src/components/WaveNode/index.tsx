@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
-import * as Tone from 'tone';
 import { useFrame } from '@react-three/fiber';
 import { Vector3 } from 'three';
 import type { Sim } from '@thorlucas/genetic-wasm';
