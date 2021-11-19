@@ -4,9 +4,9 @@ import React, { useEffect } from 'react';
 
 const App: React.FC = () => {
 	useEffect(() => {
-		import('@thorlucas/genetic-wasm').then(module => {
-			module.greet();
-		});
+		//import('@thorlucas/genetic-wasm').then(module => {
+			//module.greet();
+		//});
 	}, []);
 
 	return (
