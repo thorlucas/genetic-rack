@@ -20,26 +20,3 @@ pub fn set_panic_hook() {
     #[cfg(feature = "console_error_panic_hook")]
     console_error_panic_hook::set_once();
 }
-
-pub fn rand_unit() -> Vec3 {
-    let mut rng = rand::thread_rng();
-    let theta = (1.0 - 2.0 * rng.gen::<f32>()).acos();
-    let phi = TAU * rng.gen::<f32>();
-    
-    let rot = Mat3::from_rotation_ypr(theta, phi, 0.0);
-    rot * Vec3::Y
-}
-
-pub fn rand_lifetime(half_life: f32, max_life: Option<f32>) -> f32 {
-    let lambda = LN_2 / half_life;
-    let r: f32 = rand::thread_rng().gen();
-    let h = -r.ln()/lambda;
-    if let Some(max) = max_life {
-        h.min(max)
-    } else {
-        h
-    }
-}
-
-
-

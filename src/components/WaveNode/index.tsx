@@ -53,7 +53,7 @@ const WaveNode: React.FC = () => {
 
 	return (
 		<>
-			<mesh ref={ gRef } onClick={() => (Tone.start())}>
+			<mesh ref={ gRef } >
 				<sphereGeometry args={ [2.0, 32, 16] } />
 				<meshStandardMaterial color="hotpink" />
 			</mesh>
