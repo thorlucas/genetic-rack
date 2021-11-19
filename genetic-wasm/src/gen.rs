@@ -41,6 +41,8 @@ pub type GenLength = FixedOrRange;
 pub type GenRadius = FixedOrRange;
 pub type GenMomentum = FixedOrRange;
 
+#[derive(Deserialize)]
+#[serde(untagged)]
 pub enum GenLifetime {
     Fixed(f32),
     HalfLife {

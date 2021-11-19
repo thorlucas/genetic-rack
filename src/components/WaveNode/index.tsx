@@ -18,21 +18,27 @@ const WaveNode: React.FC = () => {
 
 	useEffect(() => {
 		async function makeSim() {
-			const { init, Sim } = await import('@thorlucas/genetic-wasm');
+			const { init, Sim, Opts } = await import('@thorlucas/genetic-wasm');
 			const { memory } = await import('@thorlucas/genetic-wasm/genetic_wasm_bg.wasm');
-			init();
 			
-			const sim = Sim.build()
-				.max_points(nPoints)
-				.initial_points(100)
-				.max_radius(40.0)
-				.min_radius(20.0)
-				.max_perp_momentum(100.0)
-				.min_perp_momentum(60.0)
-				.point_mass(10.0)
-				.large_mass(50.0)
-				.point_halflife(10.0)
-				.create();
+			//const sim = Sim.build()
+				//.max_points(nPoints)
+				//.initial_points(100)
+				//.max_radius(40.0)
+				//.min_radius(20.0)
+				//.max_perp_momentum(100.0)
+				//.min_perp_momentum(60.0)
+				//.point_mass(10.0)
+				//.large_mass(50.0)
+				//.point_halflife(10.0)
+				//.create();
+			const sim = init({
+				initial_points: 100,
+				radius: { min: 20.0, max: 40.0 },
+				momentum: { min: 60.0, max: 100.0 },
+				lifetime: { half_life: 10.0 },
+			});
+
 			const pos_ptr = sim.positions_buffer_ptr();
 			const pos = new Float32Array(memory.buffer, pos_ptr, nPoints * 3);
 

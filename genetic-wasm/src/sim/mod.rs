@@ -1,6 +1,7 @@
 use rand::Rng;
 use wasm_bindgen::prelude::*;
 use glam::*;
+use serde::Deserialize;
 use crate::points::*;
 use crate::gen::*;
 
@@ -9,10 +10,49 @@ use crate::gen::*;
 
 pub const PHYSICS_MAX_FRAMERATE: f32 = 1.0 / 60.0;
 
+#[derive(Deserialize)]
+#[serde(default)]
+pub struct GravityOptions {
+    pub point_mass: f32,
+    pub large_mass: f32,
+    pub grav_const: f32,
+}
+
+impl Default for GravityOptions {
+    fn default() -> Self {
+        Self {
+            point_mass: 10.0,
+            large_mass: 500.0,
+            grav_const: 1.0,
+        }
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(default)]
+pub struct SimOptions {
+    pub max_points: usize,
+    #[serde(flatten)]
+    pub gravity: GravityOptions,
+    pub radius: GenRadius,
+    pub momentum: GenMomentum,
+    pub lifetime: GenLifetime,
+}
+
+impl Default for SimOptions {
+    fn default() -> Self {
+        Self {
+            max_points: 1000,
+            gravity: Default::default(),
+            radius: FixedOrRange::Fixed(30.0),
+            momentum: FixedOrRange::Fixed(80.0),
+            lifetime: GenLifetime::Fixed(15.0),
+        }
+    }
+}
+
 #[wasm_bindgen]
 pub struct Sim {
-    points: PointPool,
-
     reciprocal_point_mass: f32,
     large_mass_gravity: f32,
 
@@ -20,15 +60,26 @@ pub struct Sim {
     init_momentum: GenMomentum,
     init_lifetime: GenLifetime,
 
+    points: PointPool,
     acc_dt: f32,
 }
 
-//#[wasm_bindgen]
 impl Sim {
-    //pub fn build() -> SimBuilder {
-        //SimBuilder::new()
-    //}
+    pub fn new(opts: SimOptions) -> Self {
+        Self {
+            reciprocal_point_mass: 1.0 / opts.gravity.point_mass,
+            large_mass_gravity: opts.gravity.large_mass * opts.gravity.grav_const,
+            init_radius: opts.radius,
+            init_momentum: opts.momentum,
+            init_lifetime: opts.lifetime,
+            points: PointPool::with_capacity(opts.max_points),
+            acc_dt: 0.0,
+        }
+    }
+}
 
+#[wasm_bindgen]
+impl Sim { 
     pub fn positions_buffer_ptr(&self) -> *const f32 {
         self.points.positions_as_ptr() as *const f32
     }
