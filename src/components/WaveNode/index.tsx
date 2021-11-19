@@ -8,7 +8,7 @@ import type { Sim } from '@thorlucas/genetic-wasm';
 const tempVec = new Vector3();
 const randVec = new Vector3();
 
-const nPoints = 1000;
+const nPoints = 100;
 
 const WaveNode: React.FC = () => {
 	const gRef = useRef<THREE.Mesh>(null!)
@@ -23,12 +23,14 @@ const WaveNode: React.FC = () => {
 			const { memory } = await import('@thorlucas/genetic-wasm/genetic_wasm_bg.wasm');
 			
 			const sim = Sim.build()
+				.max_points(nPoints)
 				.max_radius(40.0)
 				.min_radius(20.0)
 				.max_perp_momentum(100.0)
 				.min_perp_momentum(60.0)
 				.point_mass(10.0)
 				.large_mass(50.0)
+				.point_halflife(10.0)
 				.create();
 			const arr_ptr = sim.points_buffer_ptr();
 			const arr = new Float32Array(memory.buffer, arr_ptr, nPoints * 3);
@@ -44,7 +46,7 @@ const WaveNode: React.FC = () => {
 		if (!sim) {
 			return;
 		}
-		sim.orbit(delta);
+		sim.tick(delta);
 		pRef.current.geometry.attributes.position.needsUpdate = true;
 	});
 
