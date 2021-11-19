@@ -49,6 +49,11 @@ impl SimBuilder {
         self
     }
 
+    pub fn initial_points(mut self, n: usize) -> Self {
+        self.initial_points = n;
+        self
+    }
+
     pub fn max_radius(mut self, r: f32) -> Self {
         self.max_radius = r;
         self

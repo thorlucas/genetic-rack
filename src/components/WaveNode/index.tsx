@@ -8,7 +8,7 @@ import type { Sim } from '@thorlucas/genetic-wasm';
 const tempVec = new Vector3();
 const randVec = new Vector3();
 
-const nPoints = 4;
+const nPoints = 100;
 
 const WaveNode: React.FC = () => {
 	const gRef = useRef<THREE.Mesh>(null!)
@@ -25,6 +25,7 @@ const WaveNode: React.FC = () => {
 			
 			const sim = Sim.build()
 				.max_points(nPoints)
+				.initial_points(100)
 				.max_radius(40.0)
 				.min_radius(20.0)
 				.max_perp_momentum(100.0)
