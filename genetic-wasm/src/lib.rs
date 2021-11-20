@@ -2,6 +2,7 @@ use wasm_bindgen::prelude::*;
 use utils::set_panic_hook;
 pub use sim::*;
 
+#[macro_use]
 mod utils;
 mod gravity;
 mod points;

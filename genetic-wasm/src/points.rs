@@ -62,11 +62,11 @@ impl<'a> PointPool {
     pub fn spawn(&mut self, position: Vec3, momentum: Vec3, lifetime: f32) -> Result<()> {
         if let Some(index) = self.next_dead {
             if let PointLife::Dead { next } = self.lives[index] {
+                console_log!("spawning: {}\n\told next dead: {:?}\n\tnew next dead: {:?}", index, self.next_dead, next);
                 self.next_dead = next;
                 self.positions[index] = position;
                 self.momenta[index] = momentum;
                 self.lives[index] = PointLife::Alive { lifetime };
-                //log(format!("--> inserted {}\n\tnew next: {:?}", index, self.next_dead).as_str());
                 Ok(())
             } else {
                 panic!("Point should be dead!");
@@ -78,7 +78,7 @@ impl<'a> PointPool {
 
     fn kill_index(&mut self, index: usize) {
         if let PointLife::Alive { lifetime: _ } = self.lives[index] {
-            //log(format!("killing {}", index).as_str());
+            console_log!("killing: {}\n\told next dead: {:?}\n\tnew next dead: {:?}\n\told pos: {:?}", index, self.next_dead, index, self.positions[index]);
             self.positions[index] = Vec3::ZERO;
             self.lives[index] = PointLife::Dead { next: self.next_dead };
             self.next_dead = Some(index);
