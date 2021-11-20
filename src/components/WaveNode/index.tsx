@@ -3,14 +3,34 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import type { Sim } from '@thorlucas/genetic-wasm';
 import useDebugFPS from '@hooks/debug_fps';
+import { InterleavedBuffer, InterleavedBufferAttribute } from 'three';
 
 const nPoints = 100;
+
+type AttrDesc = {
+	size: number,
+	stride: number,
+	offset: number,
+}
+
+type BufferDesc = {
+	buffer: Float32Array,
+	items: number,
+	attrs: {
+		[key: string]: AttrDesc,
+	}
+}
+
+type SimData = {
+	points: BufferDesc,
+	sources: BufferDesc,
+}
 
 const WaveNode: React.FC = () => {
 	const gRef = useRef<THREE.Mesh>(null!)
 	const pRef = useRef<THREE.Points>(null!)
 
-	const [posArray, setPosArray] = useState<Float32Array>(null!);
+	const [simData, setSimData] = useState<SimData>(null!);
 	const [sim, setSim] = useState<Sim>(null!);
 
 	useEffect(() => {
@@ -31,14 +51,46 @@ const WaveNode: React.FC = () => {
 					}
 				],
 			});
-
-			const pos_ptr = sim.positions_buffer_ptr();
-			const pos = new Float32Array(memory.buffer, pos_ptr, nPoints * 3);
-
+			
 			setSim(sim);
-			setPosArray(pos);
-		}
 
+			const pos_desc = sim.point_pos_buffer();
+
+			// TODO: Within rust lets specify somehow that these are together and should
+			// be interleaved.
+			const src_pos_desc = sim.source_pos_buffer();
+			const src_mass_desc = sim.source_mass_buffer();
+
+			setSimData({
+				points: {
+					buffer: new Float32Array( memory.buffer, pos_desc.buffer_ptr, pos_desc.items * pos_desc.stride ),
+					items: pos_desc.items,
+					attrs: {
+						position: {
+							size: 3,
+							stride: pos_desc.stride,
+							offset: pos_desc.offset,
+						},
+					},
+				},
+				sources: {
+					buffer: new Float32Array( memory.buffer, src_pos_desc.buffer_ptr, src_pos_desc.items * src_pos_desc.stride ),
+					items: src_pos_desc.items,
+					attrs: {
+						position: {
+							size: 3,
+							stride: src_pos_desc.stride,
+							offset: src_pos_desc.offset,
+						},
+						mass: {
+							size: 1,
+							stride: src_mass_desc.stride,
+							offset: src_mass_desc.offset,
+						},
+					},
+				},
+			});
+		}
 		makeSim();
 	}, []);
 
@@ -49,22 +101,28 @@ const WaveNode: React.FC = () => {
 
 	useDebugFPS();
 
-	return (
+	return simData ? (
 		<>
+			{ /*
 			<mesh ref={ gRef } >
 				<sphereGeometry args={ [2.0, 32, 16] } />
 				<meshStandardMaterial color="hotpink" />
 			</mesh>
-			{ posArray ? (
-				<points ref={ pRef }>
-					<bufferGeometry>
-						<bufferAttribute attachObject={['attributes', 'position']} args={[posArray, 3]}/>
-					</bufferGeometry>
-					<pointsMaterial color="orange" size={1.0} />
-				</points>
-			) : null }
+			*/ }
+			<points ref={ pRef }>
+				<bufferGeometry>
+					<bufferAttribute
+						attachObject={[ 'attributes', 'position' ]}
+						array={ simData.points.buffer }
+						count={ simData.points.items }
+						itemSize={ 3 }
+						>
+					</bufferAttribute>
+				</bufferGeometry>
+				<pointsMaterial color="orange" size={1.0} />
+			</points>
 		</>
-	)
+	) : null;
 }
 
 export default WaveNode;

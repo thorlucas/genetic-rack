@@ -1,5 +1,6 @@
 use glam::Vec3;
 use crate::utils::*;
+use crate::Float32InterleavedBuffer;
 
 #[derive(Copy, Clone, Debug)]
 pub enum PointPoolError {
@@ -94,12 +95,13 @@ impl<'a> PointPool {
         }
     }
 
-    pub fn positions_as_ptr(&self) -> *const Vec3 {
-        self.positions.as_ptr()
-    }
-
-    pub fn momenta_as_ptr(&self) -> *const Vec3 {
-        self.momenta.as_ptr()
+    pub fn point_pos_buffer(&self) -> Float32InterleavedBuffer {
+        Float32InterleavedBuffer {
+            buffer_ptr: self.positions.as_ptr() as *const f32,
+            stride: 3,
+            offset: 0,
+            items: self.capacity,
+        }
     }
 }
 
