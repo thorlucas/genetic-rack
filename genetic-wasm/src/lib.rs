@@ -7,6 +7,7 @@ mod gravity;
 mod points;
 mod gen;
 mod sim;
+mod physics;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.

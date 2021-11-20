@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use crate::{gen::*, gravity::{GravitySim, GravitySimOpts}, points::PointPool};
+use crate::{gen::*, gravity::{GravitySim, GravitySimOpts}, physics::{tick, Hamiltonian}, points::PointPool};
 use wasm_bindgen::prelude::*;
 
 pub const PHYSICS_MAX_FRAMERATE: f32 = 1.0 / 60.0;
@@ -83,16 +83,19 @@ impl Sim {
     }
 
     pub fn tick(&mut self, dt: f32) {
+        self.physics_dt += dt;
+        let physics_tick: bool = self.physics_dt >= PHYSICS_MAX_FRAMERATE;
+
         for mut p in self.points.iter_mut() {
-            self.physics_dt += dt;
-            if self.physics_dt >= PHYSICS_MAX_FRAMERATE {
-                let dt = self.physics_dt;
-                self.physics_dt = 0.0; 
-
-                self.gravity.tick(dt, &mut p);
-
-                p.tick_lifetime(dt);
+            if physics_tick {
+                tick(&self.gravity, &mut p.position, &mut p.momentum, self.physics_dt);
             }
+            p.tick_lifetime(dt);
+        }
+
+
+        if physics_tick {
+            self.physics_dt = 0.0; 
         }
     }
 }

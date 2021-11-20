@@ -1,9 +1,7 @@
-use rand::Rng;
 use wasm_bindgen::prelude::*;
 use glam::*;
 use serde::Deserialize;
-use crate::points::*;
-use crate::gen::*;
+use crate::physics::Hamiltonian;
 
 #[derive(Deserialize)]
 #[serde(default)]
@@ -17,8 +15,8 @@ impl Default for GravitySimOpts {
     fn default() -> Self {
         Self {
             point_mass: 10.0,
-            large_mass: 500.0,
-            grav_const: 1.0,
+            large_mass: 5000.0,
+            grav_const: 10.0,
         }
     }
 }
@@ -38,16 +36,12 @@ impl GravitySim {
     }
 }
 
-impl GravitySim { 
-    pub fn tick(&mut self, dt: f32, p: &mut PointMutRef) {
-        let dr = self.reciprocal_point_mass * *p.momentum * dt;
-        //log(format!("dr: {:?}", dr).as_str());
-        let dp = - self.large_mass_gravity / p.position.length().powf(3.0) * *p.position;
-        //log(format!("dp: {:?}", dr).as_str());
+impl Hamiltonian for GravitySim {
+    fn dh_dp(&self, r: &Vec3, p: &Vec3) -> Vec3 {
+        self.reciprocal_point_mass * (*p)
+    }
 
-        *p.position += dr;
-        //log(format!("new pos: {:?}", *p.position).as_str());
-        *p.momentum += dp;
-        //log(format!("new mom: {:?}", *p.momentum).as_str());
+    fn dh_dr(&self, r: &Vec3, p: &Vec3) -> Vec3 {
+        (self.large_mass_gravity / r.length().powf(3.0)) * (*r)
     }
 }
