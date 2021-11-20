@@ -20,7 +20,7 @@ const WaveNode: React.FC = () => {
 			
 			const sim = init({
 				initial_points: 8,
-				max_points: 50,
+				max_points: nPoints,
 				radius: { min: 20.0, max: 40.0 },
 				momentum: { min: 60.0, max: 100.0 },
 				lifetime: { half_life: 10.0 },
@@ -36,13 +36,10 @@ const WaveNode: React.FC = () => {
 		makeSim();
 	}, []);
 
-	useFrame((_state, delta) => {
-		if (!sim) {
-			return;
-		}
+	useFrame(sim ? (_state, delta) => {
 		sim.tick(delta);
 		pRef.current.geometry.attributes.position.needsUpdate = true;
-	});
+	} : () => {});
 
 	useDebugFPS();
 
