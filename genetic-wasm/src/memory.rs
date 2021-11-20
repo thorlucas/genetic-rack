@@ -1,83 +1,52 @@
-use std::collections::HashMap;
-
+use ts_rs::TS;
 use serde::Serialize;
-use typescript_definitions_ufo_patch::TypescriptDefinition;
-use wasm_bindgen::prelude::*;
 
-// POINTER
+/// A pointer to a f32 buffer somewhere in linear memory.
 
-/// Wrapper around the pointer that gets serialized to an offset.
-#[derive(Copy, Clone, Debug)]
-#[wasm_bindgen]
-pub struct BufferF32Ptr(*const f32);
+#[derive(TS, Serialize)]
+pub struct PtrBufF32(usize);
 
-impl<T> From<T> for BufferF32Ptr
-where
-    T: AsRef<[f32]>,
+impl<T> From<T> for PtrBufF32
+    where T: AsRef<[f32]>
 {
-    fn from(v: T) -> Self {
-        let slice = v.as_ref();
-        Self(slice.as_ptr() as *const f32)
+    fn from(f32arr: T) -> Self {
+        let slc: &[f32] = f32arr.as_ref();
+        let ptr: *const f32 = slc.as_ptr();
+        Self(ptr as usize)
     }
 }
 
-impl Serialize for BufferF32Ptr {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_u32(self.0 as u32)
+#[cfg(test)]
+mod tests {
+    use super::PtrBufF32;
+    use glam::Vec3;
+    // TODO: Test using allocators
+
+    #[test]
+    pub fn f32_array_to_buffer() {
+        let arr: [f32; 4] = [1.0, 2.0, 3.0, 4.0];
+        let ptr = PtrBufF32::from(arr);
+        assert_ne!(0x0, ptr.0);
+    }
+
+    #[test]
+    pub fn f32_vec_to_buffer() {
+        let vec: Vec<_> = (1u8..100).map(f32::from).collect();
+        let ptr = PtrBufF32::from(vec);
+        assert_ne!(0x0, ptr.0);
+    }
+
+    #[test]
+    pub fn f32_arr3_to_buffer() {
+        let vec: Vec<[f32; 3]> = (1u8..20).map(f32::from).map(|n| [1.0 * n, -1.0 * n, 5.0 * n]).collect();
+        let ptr = PtrBufF32::from(vec);
+        assert_ne!(0x0, ptr.0);
+    }
+
+    #[test]
+    pub fn f32_vec3_to_buffer() {
+        let vec: Vec<Vec3> = (1u8..100).map(f32::from).map(|n| Vec3::new(n * 0.2, n, n + 0.5)).collect();
+        let ptr = PtrBufF32::from(vec);
+        assert_ne!(0x0, ptr.0);
     }
 }
-
-// BUFFER
-
-#[derive(Serialize, TypescriptDefinition)]
-/// Represents a buffer that needs to be created.
-pub struct BufferF32 {
-    /// Pointer into the linear memory of the buffer.
-    ptr: BufferF32Ptr,
-
-    /// The number of total items.
-    items: usize,
-
-    /// This will be an ordered list of the objects which appear in the buffer.
-    /// The stride and offsets can be calculated based on this list, so we don't include it in
-    /// order to avoid introducing any bugs.
-    object: BufType,
-}
-
-#[derive(Serialize)]
-#[serde(untagged)]
-enum BufType {
-    Single(f32),
-    Inter(Vec<f32>),
-}
-
-#[derive(Serialize, TypescriptDefinition)]
-/// The object types we expose. These type names are also used to look up what kind of vertices
-/// they're allowed to have.
-pub enum SimObject {
-    Point,
-    Source,
-}
-
-#[derive(Serialize, TypescriptDefinition)]
-// We want to tag externally so that we get a type map.
-/// The attributes allowed for a particular type.
-pub enum SimObjectAttributes {
-    #[serde(rename = "point")]
-    Point(Position),
-    #[serde(rename = "source")]
-    Source(Position, Mass)
-}
-
-// Marker types for attributes
-#[derive(Serialize, TypescriptDefinition)]
-#[serde(rename = "position")]
-pub struct Position(SimObject);
-
-#[derive(Serialize, TypescriptDefinition)]
-#[serde(rename = "mass")]
-pub struct Mass;
-
