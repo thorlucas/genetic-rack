@@ -1,5 +1,3 @@
-use crate::gravity::GravitySim;
-
 use glam::Vec3;
 
 pub trait Hamiltonian {

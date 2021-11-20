@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use crate::{Float32InterleavedBuffer, gen::*, gravity::{GravitySim, GravitySimOpts}, physics::{Hamiltonian, Kinetic, tick}, points::PointPool};
+use crate::{Float32InterleavedBuffer, gen::*, gravity::{GravitySim, GravitySimOpts}, physics::{Kinetic, tick}, points::PointPool};
 use wasm_bindgen::prelude::*;
 
 pub const PHYSICS_MAX_FRAMERATE: f32 = 1.0 / 60.0;
