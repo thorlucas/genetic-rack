@@ -1,16 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import { Vector3 } from 'three';
 import type { Sim } from '@thorlucas/genetic-wasm';
-
-const tempVec = new Vector3();
-const randVec = new Vector3();
+import useDebugFPS from '@hooks/debug_fps';
 
 const nPoints = 100;
-
-var frameCount: number = 0;
-var timeSinceFPSDisplay: number = 0;
 
 const WaveNode: React.FC = () => {
 	const gRef = useRef<THREE.Mesh>(null!)
@@ -21,11 +15,12 @@ const WaveNode: React.FC = () => {
 
 	useEffect(() => {
 		async function makeSim() {
-			const { init, Sim, Opts } = await import('@thorlucas/genetic-wasm');
+			const { init } = await import('@thorlucas/genetic-wasm');
 			const { memory } = await import('@thorlucas/genetic-wasm/genetic_wasm_bg.wasm');
 			
 			const sim = init({
-				initial_points: 100,
+				initial_points: 8,
+				max_points: 50,
 				radius: { min: 20.0, max: 40.0 },
 				momentum: { min: 60.0, max: 100.0 },
 				lifetime: { half_life: 10.0 },
@@ -41,22 +36,15 @@ const WaveNode: React.FC = () => {
 		makeSim();
 	}, []);
 
-	useFrame((state, delta) => {
+	useFrame((_state, delta) => {
 		if (!sim) {
 			return;
 		}
-		timeSinceFPSDisplay += delta;
-		frameCount += 1;
-
-		if (timeSinceFPSDisplay >= 1.0) {
-			console.log(`FPS: ${frameCount / timeSinceFPSDisplay}`);
-			frameCount = 0;
-			timeSinceFPSDisplay = 0;
-		}
-		
 		sim.tick(delta);
 		pRef.current.geometry.attributes.position.needsUpdate = true;
 	});
+
+	useDebugFPS();
 
 	return (
 		<>
@@ -69,7 +57,7 @@ const WaveNode: React.FC = () => {
 					<bufferGeometry>
 						<bufferAttribute attachObject={['attributes', 'position']} args={[posArray, 3]}/>
 					</bufferGeometry>
-					<pointsMaterial color="orange" size={0.3} />
+					<pointsMaterial color="orange" size={1.0} />
 				</points>
 			) : null }
 		</>
