@@ -52,10 +52,6 @@ const WaveNode: React.FC = () => {
 				],
 			});
 
-			const tester = TestMyPtr.new();
-			console.log(tester.my_version());
-			console.log(tester.their_version());
-			
 			setSim(sim);
 
 			const pos_desc = sim.point_pos_buffer();

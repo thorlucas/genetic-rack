@@ -13,7 +13,7 @@ mod sim;
 mod physics;
 mod memory;
 
-use memory::*;
+pub use memory::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -52,7 +52,7 @@ impl TestMyPtr {
     }
 
     pub fn my_version(&self) -> JsValue {
-        let my_ptr = PtrBufferF32::from(&self.data);
+        let my_ptr = BufferF32Ptr::from(&self.data);
         JsValue::from_serde(&my_ptr).unwrap()
     }
 
