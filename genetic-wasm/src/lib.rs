@@ -9,7 +9,8 @@ mod points;
 mod gen;
 mod sim;
 mod physics;
-mod memory;
+
+pub mod memory;
 
 /*
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
