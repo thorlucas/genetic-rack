@@ -24,6 +24,12 @@ const WaveNode: React.FC = () => {
 				radius: { min: 20.0, max: 40.0 },
 				momentum: { min: 60.0, max: 100.0 },
 				lifetime: { half_life: 10.0 },
+				init_sources: [
+					{
+						position: [5.0, 0.0, 0.0],
+						mass: 5000.0,
+					}
+				],
 			});
 
 			const pos_ptr = sim.positions_buffer_ptr();

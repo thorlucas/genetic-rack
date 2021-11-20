@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use crate::{gen::*, gravity::{GravitySim, GravitySimOpts}, physics::{tick, Hamiltonian}, points::PointPool};
+use crate::{gen::*, gravity::{GravitySim, GravitySimOpts}, physics::{Hamiltonian, Kinetic, tick}, points::PointPool};
 use wasm_bindgen::prelude::*;
 
 pub const PHYSICS_MAX_FRAMERATE: f32 = 1.0 / 60.0;
@@ -10,6 +10,7 @@ pub const PHYSICS_MAX_FRAMERATE: f32 = 1.0 / 60.0;
 pub struct Opts {
     initial_points: usize,
     max_points: usize,
+    point_mass: f32,
     #[serde(flatten)]
     gravity_opts: GravitySimOpts,
     radius: GenRadius,
@@ -22,6 +23,7 @@ impl Default for Opts {
         Self {
             initial_points: 10,
             max_points: 100,
+            point_mass: 10.0,
             gravity_opts: Default::default(),
             radius: FixedOrRange::Fixed(30.0),
             momentum: FixedOrRange::Fixed(80.0),
@@ -33,6 +35,7 @@ impl Default for Opts {
 #[wasm_bindgen]
 pub struct Sim {
     gravity: GravitySim,
+    kinetic: Kinetic,
     points: PointPool,
     init_radius: GenRadius,
     init_momentum: GenMomentum,
@@ -47,6 +50,7 @@ impl Sim {
         
         let mut sim = Self {
             gravity,
+            kinetic: Kinetic::new(opts.point_mass),
             points,
             init_radius: opts.radius,
             init_momentum: opts.momentum,
@@ -83,6 +87,7 @@ impl Sim {
     pub fn tick(&mut self, dt: f32) {
         for mut p in self.points.iter_mut() {
             tick(&self.gravity, &mut p.position, &mut p.momentum, dt);
+            tick(&self.kinetic, &mut p.position, &mut p.momentum, dt);
             p.tick_lifetime(dt);
         }
     }

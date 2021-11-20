@@ -6,42 +6,74 @@ use crate::physics::Hamiltonian;
 #[derive(Deserialize)]
 #[serde(default)]
 pub struct GravitySimOpts {
-    pub point_mass: f32,
-    pub large_mass: f32,
     pub grav_const: f32,
+    pub init_sources: Vec<GravitySourceOpts>,
 }
 
 impl Default for GravitySimOpts {
     fn default() -> Self {
         Self {
-            point_mass: 10.0,
-            large_mass: 5000.0,
             grav_const: 10.0,
+            init_sources: vec![],
         }
     }
 }
 
 #[wasm_bindgen]
 pub struct GravitySim {
-    reciprocal_point_mass: f32,
-    large_mass_gravity: f32,
+    grav_const: f32,
+    sources: Vec<GravitySource>,
 }
 
 impl GravitySim {
     pub fn new(opts: GravitySimOpts) -> Self {
+        let grav_const: f32 = opts.grav_const;
         Self {
-            reciprocal_point_mass: 1.0 / opts.point_mass,
-            large_mass_gravity: opts.large_mass * opts.grav_const,
+            grav_const,
+            sources: opts.init_sources.into_iter().map(|src| GravitySource::new(src, grav_const)).collect(),
         }
+    }
+
+    pub fn add_source(&mut self, opts: GravitySourceOpts) {
+        self.sources.push(GravitySource::new(opts, self.grav_const));
     }
 }
 
 impl Hamiltonian for GravitySim {
-    fn dh_dp(&self, r: &Vec3, p: &Vec3) -> Vec3 {
-        self.reciprocal_point_mass * (*p)
-    }
-
+    // Optimization:
+    // Since we know that gravity contributions never depend on momentum, we can skip this
+    // NOTE: Change if this ever changes
     fn dh_dr(&self, r: &Vec3, p: &Vec3) -> Vec3 {
-        (self.large_mass_gravity / r.length().powf(3.0)) * (*r)
+        (&self.sources[..]).dh_dr(r, p)
     }
 }
+
+#[derive(Default, Deserialize)]
+#[serde(default)]
+#[wasm_bindgen]
+pub struct GravitySourceOpts {
+    position: Vec3,
+    mass: f32,
+}
+
+struct GravitySource {
+    position: Vec3,
+    mass_gravity: f32,
+}
+
+impl GravitySource {
+    pub fn new(opts: GravitySourceOpts, grav_const: f32) -> Self {
+        Self {
+            position: opts.position,
+            mass_gravity: opts.mass * grav_const,
+        }
+    }
+}
+
+impl Hamiltonian for GravitySource {
+    fn dh_dr(&self, r: &Vec3, _: &Vec3) -> Vec3 {
+        let r = *r - self.position;
+        (self.mass_gravity / r.length().powf(3.0)) * r
+    }
+}
+
