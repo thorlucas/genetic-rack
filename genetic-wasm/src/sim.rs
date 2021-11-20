@@ -37,7 +37,6 @@ pub struct Sim {
     init_radius: GenRadius,
     init_momentum: GenMomentum,
     init_lifetime: GenLifetime,
-    physics_dt: f32,
 }
 
 #[wasm_bindgen]
@@ -52,7 +51,6 @@ impl Sim {
             init_radius: opts.radius,
             init_momentum: opts.momentum,
             init_lifetime: opts.lifetime,
-            physics_dt: 0.0,
         };
 
         sim.spawn_points(opts.initial_points);
@@ -83,19 +81,9 @@ impl Sim {
     }
 
     pub fn tick(&mut self, dt: f32) {
-        self.physics_dt += dt;
-        let physics_tick: bool = self.physics_dt >= PHYSICS_MAX_FRAMERATE;
-
         for mut p in self.points.iter_mut() {
-            if physics_tick {
-                tick(&self.gravity, &mut p.position, &mut p.momentum, self.physics_dt);
-            }
+            tick(&self.gravity, &mut p.position, &mut p.momentum, dt);
             p.tick_lifetime(dt);
-        }
-
-
-        if physics_tick {
-            self.physics_dt = 0.0; 
         }
     }
 }
