@@ -1,1 +1,1 @@
-export type Component = "point" | "source";
+export type Component = { Point: number } | { Source: number };

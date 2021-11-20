@@ -4,6 +4,7 @@ use serde::Serialize;
 /// A pointer to a f32 buffer somewhere in linear memory.
 
 #[derive(TS, Serialize, Copy, Clone, Debug)]
+#[ts(export)]
 pub struct PtrBufF32(usize);
 
 impl<T> From<T> for PtrBufF32
