@@ -9,6 +9,9 @@ const randVec = new Vector3();
 
 const nPoints = 100;
 
+var frameCount: number = 0;
+var timeSinceFPSDisplay: number = 0;
+
 const WaveNode: React.FC = () => {
 	const gRef = useRef<THREE.Mesh>(null!)
 	const pRef = useRef<THREE.Points>(null!)
@@ -42,6 +45,15 @@ const WaveNode: React.FC = () => {
 		if (!sim) {
 			return;
 		}
+		timeSinceFPSDisplay += delta;
+		frameCount += 1;
+
+		if (timeSinceFPSDisplay >= 1.0) {
+			console.log(`FPS: ${frameCount / timeSinceFPSDisplay}`);
+			frameCount = 0;
+			timeSinceFPSDisplay = 0;
+		}
+		
 		sim.tick(delta);
 		pRef.current.geometry.attributes.position.needsUpdate = true;
 	});
