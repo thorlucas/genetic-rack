@@ -35,7 +35,7 @@ const WaveNode: React.FC = () => {
 
 	useEffect(() => {
 		async function makeSim() {
-			const { init } = await import('@thorlucas/genetic-wasm');
+			const { init, TestMyPtr } = await import('@thorlucas/genetic-wasm');
 			const { memory } = await import('@thorlucas/genetic-wasm/genetic_wasm_bg.wasm');
 			
 			const sim = init({
@@ -51,6 +51,10 @@ const WaveNode: React.FC = () => {
 					}
 				],
 			});
+
+			const tester = TestMyPtr.new();
+			console.log(tester.my_version());
+			console.log(tester.their_version());
 			
 			setSim(sim);
 
