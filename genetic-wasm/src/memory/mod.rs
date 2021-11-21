@@ -1,6 +1,7 @@
 pub mod ptrbuf;
-pub mod buffer;
-pub mod simobjs;
+pub mod buf;
+pub mod comps;
 
-pub use ptrbuf::PtrBufF32;
-pub use buffer::BufferF32;
+pub use ptrbuf::*;
+pub use comps::{Point, Source, Component};
+pub use buf::{BufferF32, IBufferF32};

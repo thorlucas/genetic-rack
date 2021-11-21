@@ -2,7 +2,6 @@ use wasm_bindgen::prelude::*;
 use glam::*;
 use serde::Deserialize;
 use crate::physics::Hamiltonian;
-use crate::Float32InterleavedBuffer;
 
 #[derive(Deserialize)]
 #[serde(default)]
@@ -43,23 +42,23 @@ impl GravitySim {
         self.sources.push(GravitySource::new(opts, self.grav_const));
     }
 
-    pub fn source_pos_buffer(&self) -> Float32InterleavedBuffer {
-        Float32InterleavedBuffer {
-            buffer_ptr: self.sources.as_ptr() as *const f32,
-            stride: 4,
-            offset: 0,
-            items: self.sources.len(),
-        }
-    }
+    //pub fn source_pos_buffer(&self) -> Float32InterleavedBuffer {
+        //Float32InterleavedBuffer {
+            //buffer_ptr: self.sources.as_ptr() as *const f32,
+            //stride: 4,
+            //offset: 0,
+            //items: self.sources.len(),
+        //}
+    //}
 
-    pub fn source_mass_buffer(&self) -> Float32InterleavedBuffer {
-        Float32InterleavedBuffer {
-            buffer_ptr: self.sources.as_ptr() as *const f32,
-            stride: 4,
-            offset: 3,
-            items: self.sources.len(),
-        }
-    }
+    //pub fn source_mass_buffer(&self) -> Float32InterleavedBuffer {
+        //Float32InterleavedBuffer {
+            //buffer_ptr: self.sources.as_ptr() as *const f32,
+            //stride: 4,
+            //offset: 3,
+            //items: self.sources.len(),
+        //}
+    //}
 }
 
 impl Hamiltonian for GravitySim {

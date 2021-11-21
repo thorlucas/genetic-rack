@@ -25,8 +25,9 @@
 		"start": "yarn wasm-build; craco start",
 		"build": "yarn wasm-build; craco build",
 		"test": "craco test",
-		"wasm-build": "cd genetic-wasm; wasm-pack build",
-		"wasm-watch-tests": "cd genetic-wasm; cargo watch -x 'test export' -s 'nvr -c 'checkt'' -i bindings",
+		"wasm-export-bindings": "cd genetic-wasm; find ./bindings -name '*.ts' | xargs rm ; cargo test export_bindings",
+		"wasm-build": "cd genetic-wasm; yarn run wasm-export-bindings && wasm-pack build && cp -r bindings pkg",
+		"wasm-watch-tests": "cd genetic-wasm; cargo watch -w src -s \"yarn wasm-export-bindings && nvr -c checkt\"",
 		"eject": "react-scripts eject"
 	},
 	"eslintConfig": {

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import type { Sim } from '@thorlucas/genetic-wasm';
+import type { Sim, BufferF32 } from '@thorlucas/genetic-wasm';
 import useDebugFPS from '@hooks/debug_fps';
 import { InterleavedBuffer, InterleavedBufferAttribute } from 'three';
 
@@ -52,7 +52,10 @@ const WaveNode: React.FC = () => {
 				],
 			});
 
-			setSim(sim);
+			const x: BufferF32[] = sim.get_buffers();
+			console.log(x);
+
+			//setSim(sim);
 		}
 		makeSim();
 	}, []);

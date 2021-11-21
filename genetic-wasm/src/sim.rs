@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use crate::{Float32InterleavedBuffer, gen::*, gravity::{GravitySim, GravitySimOpts}, physics::{Kinetic, tick}, points::PointPool};
+use crate::{gen::*, gravity::{GravitySim, GravitySimOpts}, memory::{BufferF32, Component, IBufferF32}, physics::{Kinetic, tick}, points::PointPool};
 use wasm_bindgen::prelude::*;
 
 pub const PHYSICS_MAX_FRAMERATE: f32 = 1.0 / 60.0;
@@ -43,7 +43,7 @@ pub struct Sim {
 }
 
 #[wasm_bindgen]
-impl Sim {
+impl Sim { 
     pub fn new(opts: Opts) -> Self {
         let gravity = GravitySim::new(opts.gravity_opts);
         let points = PointPool::with_capacity(opts.max_points);
@@ -84,15 +84,13 @@ impl Sim {
         }
     }
 
-    pub fn point_pos_buffer(&self) -> Float32InterleavedBuffer {
-        self.points.point_pos_buffer()
-    }
-    
-    pub fn source_pos_buffer(&self) -> Float32InterleavedBuffer {
-        self.gravity.source_pos_buffer()
-    }
-
-    pub fn source_mass_buffer(&self) -> Float32InterleavedBuffer {
-        self.gravity.source_mass_buffer()
+    pub fn get_buffers(&self) -> Vec<IBufferF32> {
+        vec![
+            BufferF32::new(
+                Component::point(&[("Foo", 3)]),
+                10,
+                &[1f32],
+            ).into()
+        ]
     }
 }
