@@ -38,7 +38,7 @@ pub struct Source {
 /// The descriptor of a game component's memory information.
 #[derive(Serialize, TS)]
 #[ts(export)]
-#[ts(rename_all="lowercase")]
+#[serde(rename_all="lowercase")]
 #[serde(tag="type")]
 pub enum Component {
     Point(Point),

@@ -16,8 +16,6 @@ impl<T: Sized> From<&[T]> for PtrBufF32 {
 
 #[cfg(test)]
 mod tests {
-    use core::slice::SlicePattern;
-
     use glam::Vec3;
     use super::PtrBufF32;
     // TODO: Test using allocators

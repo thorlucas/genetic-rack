@@ -89,3 +89,9 @@ impl From<BufferF32> for IBufferF32 {
         JsValue::from_serde(&buf).unwrap().into()
     }
 }
+
+impl IBufferF32 {
+    pub fn from_bufs(bufs: Vec<BufferF32>) -> Vec<IBufferF32> {
+        bufs.into_iter().map(|b| IBufferF32::from(b)).collect()
+    }
+}

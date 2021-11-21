@@ -85,12 +85,9 @@ impl Sim {
     }
 
     pub fn get_buffers(&self) -> Vec<IBufferF32> {
-        vec![
-            BufferF32::new(
-                Component::point(&[("Foo", 3)]),
-                10,
-                &[1f32],
-            ).into()
-        ]
+        let mut bufs = vec![];
+        bufs.extend(self.gravity.buffers());
+        bufs.extend(self.points.buffers());
+        IBufferF32::from_bufs(bufs)
     }
 }

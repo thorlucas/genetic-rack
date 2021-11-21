@@ -1,5 +1,5 @@
 use glam::Vec3;
-use crate::utils::*;
+use crate::{memory::{BufferF32, Component}, utils::*};
 
 #[derive(Copy, Clone, Debug)]
 pub enum PointPoolError {
@@ -102,6 +102,24 @@ impl<'a> PointPool {
             //items: self.capacity,
         //}
     //}
+    pub fn buffers(&self) -> Vec<BufferF32> {
+        vec![
+            BufferF32::new(
+                Component::point(&[
+                    ("position", 3),
+                ]),
+                self.capacity,
+                self.positions.as_slice().into(),
+            ),
+            BufferF32::new(
+                Component::point(&[
+                    ("momentum", 3),
+                ]),
+                self.capacity,
+                self.momenta.as_slice().into(),
+            )
+        ]
+    }
 }
 
 pub struct IterMut<'a> {
