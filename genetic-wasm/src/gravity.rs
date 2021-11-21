@@ -1,7 +1,7 @@
 use wasm_bindgen::prelude::*;
 use glam::*;
 use serde::Deserialize;
-use crate::physics::Hamiltonian;
+use crate::{memory::{BufferF32, Component, Point}, physics::Hamiltonian};
 
 #[derive(Deserialize)]
 #[serde(default)]
@@ -59,6 +59,16 @@ impl GravitySim {
             //items: self.sources.len(),
         //}
     //}
+    pub fn buffers(&self) -> Vec<BufferF32> {
+        BufferF32::new(
+            Component::point(&[
+                ("position", 3),
+                ("mass", 1),
+            ]),
+            self.sources.len(),
+            self.sources.as_ref().into()
+        )
+    }
 }
 
 impl Hamiltonian for GravitySim {
@@ -78,9 +88,19 @@ pub struct GravitySourceOpts {
     mass: f32,
 }
 
+#[repr(C)]
 struct GravitySource {
     position: Vec3,
     mass_gravity: f32,
+}
+
+impl From<GravitySource> for &[f32] {
+    fn from(g: GravitySource) -> Self {
+        let ptr: *const GravitySource = &g;
+        unsafe {
+            std::slice::from_raw_parts(ptr as *const f32, std::mem::size_of::<Self>())
+        }
+    }
 }
 
 impl GravitySource {

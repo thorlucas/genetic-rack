@@ -35,7 +35,7 @@ pub struct BufferF32 {
 }
 
 impl BufferF32 {
-    pub fn new(component: Component, items: usize, buf: &[f32]) -> Self {
+    pub fn new(component: Component, items: usize, buf: PtrBufF32) -> Self {
         Self {
             ptr: buf.into(),
             items,
