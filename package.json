@@ -7,7 +7,6 @@
 		"@testing-library/jest-dom": "^5.11.4",
 		"@testing-library/react": "^11.1.0",
 		"@testing-library/user-event": "^12.1.10",
-		"@thorlucas/genetic-wasm": "link:./genetic-wasm/pkg",
 		"@types/jest": "^26.0.15",
 		"@types/node": "^12.0.0",
 		"@types/react": "^17.0.0",
@@ -22,12 +21,9 @@
 		"web-vitals": "^1.0.1"
 	},
 	"scripts": {
-		"start": "yarn wasm-build; craco start",
-		"build": "yarn wasm-build; craco build",
+		"start": "craco start",
+		"build": "craco build",
 		"test": "craco test",
-		"wasm-export-bindings": "cd genetic-wasm; find ./bindings -name '*.ts' | xargs rm ; cargo test export_bindings",
-		"wasm-build": "cd genetic-wasm; yarn run wasm-export-bindings && wasm-pack build && cp -r bindings pkg",
-		"wasm-watch-tests": "cd genetic-wasm; cargo watch -w src -s \"yarn wasm-export-bindings && nvr -c checkt\"",
 		"eject": "react-scripts eject"
 	},
 	"eslintConfig": {
@@ -50,6 +46,7 @@
 	},
 	"devDependencies": {
 		"@craco/craco": "^6.3.0",
+		"@wasm-tool/wasm-pack-plugin": "^1.6.0",
 		"autoprefixer": "^9",
 		"postcss": "^7",
 		"react-app-rewire-alias": "^1.1.4",

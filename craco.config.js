@@ -1,33 +1,23 @@
 const { addBeforeLoader, loaderByName } = require('@craco/craco');
 const { CracoAliasPlugin, configPaths } = require('react-app-rewire-alias');
+const WasmPackPlugin = require('@wasm-tool/wasm-pack-plugin')
+
 const path = require('path');
 
 module.exports = {
 	webpack: {
-		configure: (webpackConfig) => {
-			const wasmExtRegex = /\.wasm$/;
-			webpackConfig.resolve.extensions.push('.wasm');
-			webpackConfig.resolve.symlinks = false;
-			//webpackConfig.resolve.roots = [path.resolve(__dirname, 'node_modules')]
-			//webpackConfig.resolveLoader.roots = [path.resolve(__dirname, 'node_modules')]
-
-			webpackConfig.module.rules.forEach((rule) => {
-				(rule.oneOf || []).forEach((oneOf) => {
-					if (oneOf.loader && oneOf.loader.indexOf('file-loader') >= 0) {
-						oneOf.exclude.push(wasmExtRegex);
-					}
-				});
-			});
-
-			const wasmLoader = {
-				test: wasmExtRegex,
-				exclude: /node_modules/,
-				loaders: ['wasm-loader'],
-			};
-
-			addBeforeLoader(webpackConfig, loaderByName('file-loader'), wasmLoader);
-
-			return webpackConfig;
+		configure: {
+			experiments: {
+				asyncWebAssembly: true,
+				futureDefaults: true,
+			},
+		},
+		plugins: {
+			add: [
+				new WasmPackPlugin({
+					crateDirectory: path.resolve(__dirname, 'genetic-wasm'),
+				}),
+			],
 		},
 	},
 	plugins: [

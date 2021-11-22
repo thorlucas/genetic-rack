@@ -14,7 +14,9 @@
 			"@hooks/*": ["src/hooks/*"],
 
 			"@adapters": ["src/adapters"],
-			"@adapters/*": ["src/adapters/*"]
+			"@adapters/*": ["src/adapters/*"],
+
+			"@wasm": ["genetic-wasm/pkg"]
 		}
 	}
 }

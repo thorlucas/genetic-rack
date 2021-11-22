@@ -1,19 +1,10 @@
-use js_sys::Float32Array;
 use serde::Serialize;
 use ts_rs::TS;
 use super::{AttributeDescriptor, InterleavedAttributeDescriptor, never};
 
 #[derive(Serialize, TS)]
-#[serde(untagged)]
-pub enum BufferType {
-    Offset {
-        offset: usize,
-    },
-    Array {
-        #[ts(type="Float32Array")]
-        #[serde(with="never")]
-        array: Float32Array,
-    }
+pub struct Float32Array {
+    offset: usize
 }
 
 #[derive(Serialize, TS)]
@@ -22,13 +13,11 @@ pub enum BufferType {
 #[serde(rename_all="lowercase")]
 pub enum AttributeBuffer {
     Single { 
-        #[ts(inline)]
-        buffer: BufferType,
+        buffer: Float32Array,
         attribute: AttributeDescriptor,
     },
     Interleaved {
-        #[ts(inline)]
-        buffer: BufferType,
+        buffer: Float32Array,
         attributes: Vec<InterleavedAttributeDescriptor>,
     },
 }

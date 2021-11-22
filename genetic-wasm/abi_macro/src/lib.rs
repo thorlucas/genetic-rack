@@ -24,7 +24,6 @@ pub fn generate_typescript(_: TokenStream) -> TokenStream {
         Attribute,
         AttributeDescriptor,
         InterleavedAttributeDescriptor,
-        BufferType,
         AttributeBuffer,
     };
 
