@@ -1,1 +1,4 @@
-export type Attribute = "position" | "momentum" | "mass";
+export interface Attribute {
+  name: string;
+  width: number;
+}

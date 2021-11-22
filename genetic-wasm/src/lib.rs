@@ -2,6 +2,10 @@ use wasm_bindgen::prelude::*;
 use utils::set_panic_hook;
 pub use sim::*;
 
+use abi_macro::generate_typescript;
+
+generate_typescript!();
+
 #[macro_use]
 mod utils;
 mod gravity;
@@ -11,7 +15,6 @@ mod sim;
 mod physics;
 
 mod memory;
-pub mod abi;
 
 /*
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
