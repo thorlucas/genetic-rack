@@ -1,4 +1,5 @@
-target
+**/target
+**/bindings
 **/*.rs.bk
 Cargo.lock
 bin/
