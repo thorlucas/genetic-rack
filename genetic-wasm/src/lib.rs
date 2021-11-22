@@ -11,7 +11,7 @@ mod sim;
 mod physics;
 
 mod memory;
-pub mod attributes;
+pub mod abi;
 
 /*
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global

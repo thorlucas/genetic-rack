@@ -1,5 +1,4 @@
-use serde::Serialize;
-use ts_rs::TS;
+use serde::Serialize; use ts_rs::TS;
 
 macro_rules! attr_desc {
     ($attr:ident : 4 $($t:tt)*) => { attr_desc!( $($t)* ($attr "4") ); };
@@ -35,7 +34,6 @@ macro_rules! attr_desc {
             $attr {
                 #[ts(type=$size)]
                 size: usize,
-                offset: usize,
             },
         }/{
             $($names)*
@@ -44,7 +42,7 @@ macro_rules! attr_desc {
     }
 }
 
-attr_desc!{
+attr_desc! {
     Position: 3
     Momentum: 3
     Mass: 1
