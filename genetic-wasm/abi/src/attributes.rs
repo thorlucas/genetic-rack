@@ -13,14 +13,11 @@ macro_rules! attr_desc {
         #[derive(Serialize, TS)]
         #[serde(rename_all="lowercase")]
         #[serde(tag="type")]
-        #[ts(export)]
-        #[allow(dead_code)]
         pub enum AttributeDescriptor {
             $($acc)*
         }
 
         #[derive(TS, Serialize)]
-        #[ts(export)]
         #[serde(rename_all="lowercase")]
         pub enum Attribute {
             $($names)*

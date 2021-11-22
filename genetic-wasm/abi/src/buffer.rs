@@ -24,14 +24,11 @@ pub enum AttributeBuffer {
     Single { 
         #[ts(inline)]
         buffer: BufferType,
-        // FIXME: Have to inline as a workaround for ts-rs bug that does not import
-        #[ts(inline)]
         attribute: AttributeDescriptor,
     },
     Interleaved {
         #[ts(inline)]
         buffer: BufferType,
-        #[ts(inline)]
         attributes: Vec<InterleavedAttributeDescriptor>,
     },
 }

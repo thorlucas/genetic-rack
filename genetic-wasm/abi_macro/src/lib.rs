@@ -1,8 +1,7 @@
 use proc_macro::TokenStream;
 use quote::quote;
 use ts_rs::TS;
-
-use abi::{Attribute, AttributeDescriptor, InterleavedAttributeDescriptor};
+use abi::*;
 
 macro_rules! export {
     ($($t:ty),*$(,)?) => {
@@ -24,28 +23,30 @@ pub fn generate_typescript(_: TokenStream) -> TokenStream {
     let exports = export! {
         Attribute,
         AttributeDescriptor,
-        InterleavedAttributeDescriptor
+        InterleavedAttributeDescriptor,
+        BufferType,
+        AttributeBuffer,
     };
 
     TokenStream::from(quote! {
         #[wasm_bindgen(typescript_custom_section)]
-        const DECLARATIONS: &'static str = #exports;
+        const ABI_BINDINGS: &'static str = #exports;
     })
 }
 
-#[cfg(test)]
-mod test {
-    use ts_rs::TS;
-    use abi::{Attribute, AttributeDescriptor, InterleavedAttributeDescriptor};
+//#[cfg(test)]
+//mod test {
+    //use ts_rs::TS;
+    //use abi::{Attribute, AttributeDescriptor, InterleavedAttributeDescriptor};
 
-    #[test]
-    pub fn test_export() {
-        let exports = export! {
-            Attribute,
-            AttributeDescriptor,
-            InterleavedAttributeDescriptor,
-        };
+    //#[test]
+    //pub fn test_export() {
+        //let exports = export! {
+            //Attribute,
+            //AttributeDescriptor,
+            //InterleavedAttributeDescriptor,
+        //};
 
-        println!("{}", exports);
-    }
-}
+        //println!("{}", exports);
+    //}
+//}

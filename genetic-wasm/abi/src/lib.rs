@@ -1,7 +1,8 @@
 mod attributes;
 mod interleaved;
+mod buffer;
 pub mod never;
-pub mod buffer;
 
-pub use attributes::{Attribute, AttributeDescriptor};
-pub use interleaved::InterleavedAttributeDescriptor;
+pub use attributes::*;
+pub use interleaved::*;
+pub use buffer::*;
