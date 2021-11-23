@@ -5,7 +5,7 @@ import type { Sim, BufferF32 } from '@thorlucas/genetic-wasm';
 import useDebugFPS from '@hooks/debug_fps';
 import { InterleavedBuffer, InterleavedBufferAttribute } from 'three';
 
-const nPoints = 100;
+const nPoints = 5000;
 
 type SimBufMap = {
 	point: {
@@ -18,8 +18,27 @@ function makeBuffer(memory: WebAssembly.Memory, offset: number, items: number, w
 	return [f32s, width];
 }
 
+type InitSource = {
+	position: THREE.Vector3,
+	mass: number,
+}
+
+const numInitSources = 20;
+
+let initSources: InitSource[] = Array.from({length: numInitSources}, () => {
+	return {
+		position: new THREE.Vector3().randomDirection().multiplyScalar(Math.random()*200.0),
+		mass: Math.pow(Math.random()*20.0, 3.0),
+	};
+});
+
+let avgSourcePos = new THREE.Vector3();
+initSources.forEach((src) => avgSourcePos.add(src.position));
+avgSourcePos.divideScalar(numInitSources);
+
+initSources.forEach((src) => src.position.sub(avgSourcePos));
+
 const WaveNode: React.FC = () => {
-	const gRef = useRef<THREE.Mesh>(null!)
 	const pRef = useRef<THREE.Points>(null!)
 
 	const [attrBufs, setAttrBufs] = useState<SimBufMap>(null!);
@@ -31,17 +50,15 @@ const WaveNode: React.FC = () => {
 			const { memory } = await import('@thorlucas/genetic-wasm/genetic_wasm_bg.wasm');
 			
 			const sim = init({
-				initial_points: 3,
-				max_points: 3,
-				radius: { min: 20.0, max: 40.0 },
-				momentum: { min: 60.0, max: 100.0 },
-				lifetime: { half_life: 10.0 },
-				init_sources: [
-					{
-						position: [5.0, 0.0, 0.0],
-						mass: 5000.0,
-					}
-				],
+				initial_points: nPoints,
+				max_points: nPoints,
+				radius: { max: 120.0 },
+				momentum: { min: 100.0, max: 200.0 },
+				lifetime: 10000000.0,
+				init_sources: initSources.map((src) => { return {
+					position: src.position.toArray(),
+					mass: src.mass,
+				}})
 			});
 
 			const bufs: BufferF32[] = sim.get_buffers();
@@ -76,19 +93,25 @@ const WaveNode: React.FC = () => {
 
 	useDebugFPS();
 
+	const sourceMeshes = initSources.map((src: InitSource) => (
+		<mesh position={ src.position}>
+			<sphereGeometry args={ [Math.pow(src.mass / 100, 1/3), 32, 16] } />
+			<meshStandardMaterial color="hotpink" />
+		</mesh>
+	));
+
 	return attrBufs ? (
 		<>
-			{ /*
-			<mesh ref={ gRef } >
-				<sphereGeometry args={ [2.0, 32, 16] } />
-				<meshStandardMaterial color="hotpink" />
-			</mesh>
-			*/ }
+			<ambientLight intensity={0.05} />
+			<pointLight position={ new THREE.Vector3(100.0, 200.0, 50.0) } intensity={1} distance={1000.0} decay={4}/> 
+
+			{ sourceMeshes }
+			
 			<points ref={ pRef }>
 				<bufferGeometry>
 					<bufferAttribute attachObject={['attributes', 'position']} args={ attrBufs.point.position } />
 				</bufferGeometry>
-				<pointsMaterial color="orange" size={1.0} />
+				<pointsMaterial color="orange" size={0.3} />
 			</points>
 		</>
 	) : null;
