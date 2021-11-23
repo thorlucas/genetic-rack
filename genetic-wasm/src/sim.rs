@@ -25,8 +25,8 @@ impl Default for Opts {
             max_points: 100,
             point_mass: 10.0,
             gravity_opts: Default::default(),
-            radius: FixedOrRange::Fixed(30.0),
-            momentum: FixedOrRange::Fixed(80.0),
+            radius: GenRadius::Fixed(30.0),
+            momentum: GenMomentum::Fixed(80.0),
             lifetime: GenLifetime::Fixed(15.0),
         }
     }

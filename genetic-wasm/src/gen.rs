@@ -38,8 +38,23 @@ impl<R: RngCore> Gen<f32, R> for FixedOrRange {
 }
 
 pub type GenLength = FixedOrRange;
-pub type GenRadius = FixedOrRange;
 pub type GenMomentum = FixedOrRange;
+
+#[derive(Deserialize)]
+#[serde(untagged)]
+pub enum GenRadius {
+    Fixed(f32),
+    Range(Range),
+}
+
+impl<R: RngCore> Gen<f32, R> for GenRadius {
+    fn gen(&self, rng: &mut R) -> f32 {
+        match self {
+            Self::Fixed(r) => *r,
+            Self::Range(r) => (r.max - r.min) * rng.gen::<f32>().sqrt() + r.min,
+        }
+    }
+}
 
 #[derive(Deserialize)]
 #[serde(untagged)]
@@ -79,7 +94,7 @@ pub fn gen_unit<R: RngCore>(rng: &mut R) -> Vec3 {
     rot * Vec3::Y
 }
 
-pub fn gen_vec<R: RngCore>(rng: &mut R, r: &GenLength) -> Vec3 {
+pub fn gen_vec<R: RngCore, T: Gen<f32, R>>(rng: &mut R, r: &T) -> Vec3 {
     r.gen(rng) * gen_unit(rng)
 }
 

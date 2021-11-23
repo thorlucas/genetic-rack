@@ -5,7 +5,7 @@ import type { Sim, BufferF32 } from '@thorlucas/genetic-wasm';
 import useDebugFPS from '@hooks/debug_fps';
 import { InterleavedBuffer, InterleavedBufferAttribute } from 'three';
 
-const nPoints = 5000;
+const nPoints = 10000;
 
 type SimBufMap = {
 	point: {
@@ -25,10 +25,11 @@ type InitSource = {
 
 const numInitSources = 20;
 
-let initSources: InitSource[] = Array.from({length: numInitSources}, () => {
+let initSources: InitSource[] = Array.from({length: numInitSources}, (_, i: number) => {
+	console.log(i);
 	return {
-		position: new THREE.Vector3().randomDirection().multiplyScalar(Math.random()*200.0),
-		mass: Math.pow(Math.random()*20.0, 3.0),
+		position: new THREE.Vector3().randomDirection().multiplyScalar(Math.sqrt(Math.random())*100.0),
+		mass: Math.pow(Math.random(), 3.0)*10000.0,
 	};
 });
 
@@ -52,9 +53,10 @@ const WaveNode: React.FC = () => {
 			const sim = init({
 				initial_points: nPoints,
 				max_points: nPoints,
-				radius: { max: 120.0 },
-				momentum: { min: 100.0, max: 200.0 },
+				radius: { max: 150.0 },
+				momentum: { max: 1000.0 },
 				lifetime: 10000000.0,
+				point_mass: 100.0,
 				init_sources: initSources.map((src) => { return {
 					position: src.position.toArray(),
 					mass: src.mass,
